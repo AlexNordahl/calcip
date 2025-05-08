@@ -1,33 +1,26 @@
 #include <iostream>
 #include <string>
-#include <list>
+#include <vector>
+#include <string_view>
 
-std::string decToBinary(int decimal);
+std::string intToBinary(int input);
+void checkAddress(const std::string input);
 
 int main(int argc, char const *argv[])
 {
-    try
-    {
-        int input = std::stoi(argv[1]);
-        std::cout << decToBinary(input) << std::endl;
-    }
-    catch(const std::invalid_argument& e)
-    {
-        std::cerr << "stoi error" << '\n';
-    }   
-    
+    checkAddress(argv[1]);
     return 0;
 }
 
-std::string decToBinary(int decimal)
+std::string intToBinary(int input)
 {
-    std::string result {};
     int fitToSize = 8;
+    std::string result {};
     
-    while (decimal >= 1)
+    while (input >= 1)
     {
-        result.insert(0, std::to_string(decimal % 2));
-        decimal /= 2;
+        result.insert(0, std::to_string(input % 2));
+        input /= 2;
     }
     
     int resultSize = result.size();
@@ -35,4 +28,53 @@ std::string decToBinary(int decimal)
         result.insert(0, "0");
         
     return result;
+}
+
+void checkAddress(const std::string input)
+{
+    const int MASK_MAX = 32;
+    const int DOT_MAX = 3;
+    const int SLASH_MAX = 1;
+
+    std::string currentOctet {};
+    int dotCount = 0;
+    int slashCount = 0;
+
+    int index = 0;
+    for (const char elem : input)
+    {
+        if (elem == '.')
+        {
+            int octetValue = std::stoi(currentOctet);
+            if (octetValue < 0 or octetValue > 255)
+                throw std::invalid_argument("octet out of range");
+
+            currentOctet.clear();
+
+            dotCount++;
+            index++;
+            continue;
+        }
+
+        if (elem == '/')
+        {
+            if (dotCount != DOT_MAX or SLASH_MAX != 1)
+                throw std::invalid_argument("invalid address format");
+            
+            int maskIndex = index + 1;
+            
+            if (maskIndex > input.size())
+                throw std::invalid_argument("mask was not provided");
+
+            int mask = std::stoi(input.substr(maskIndex));
+
+            if (0 > mask or mask > MASK_MAX)
+                throw std::invalid_argument("mask out of range");
+
+            slashCount++;
+        }
+
+        currentOctet.push_back(elem);
+        index++;
+    }
 }
