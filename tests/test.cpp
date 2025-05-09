@@ -2,7 +2,7 @@
 #include <string>
 
 std::string intToBinary(int input);
-void checkAddress(const std::string input);
+std::vector<int> parseAddress(const std::string input);
 
 TEST(IntToBinaryTest, ConvertsCorrectly) {
     EXPECT_EQ(intToBinary(0), "00000000");
@@ -11,11 +11,11 @@ TEST(IntToBinaryTest, ConvertsCorrectly) {
 }
 
 TEST(CheckAddressTest, ValidAddressDoesNotThrow) {
-    EXPECT_NO_THROW(checkAddress("192.168.1.1/24"));
+    EXPECT_NO_THROW(parseAddress("192.168.1.1/24"));
 }
 
 TEST(CheckAddressTest, InvalidAddressThrows) {
-    EXPECT_THROW(checkAddress("999.999.999.999/24"), std::invalid_argument);
-    EXPECT_THROW(checkAddress("192.168.1.1/33"), std::invalid_argument);
-    EXPECT_THROW(checkAddress("192.168.1.1"), std::invalid_argument);
+    EXPECT_THROW(parseAddress("999.999.999.999/24"), std::invalid_argument);
+    EXPECT_THROW(parseAddress("192.168.1.1/33"), std::invalid_argument);
+    EXPECT_THROW(parseAddress("192.168.1.1"), std::invalid_argument);
 }
