@@ -39,6 +39,7 @@ void checkAddress(const std::string input)
     std::string currentOctet {};
     int dotCount = 0;
     int slashCount = 0;
+    bool hasMask = false;
 
     int index = 0;
     for (const char elem : input)
@@ -70,11 +71,15 @@ void checkAddress(const std::string input)
 
             if (0 > mask or mask > MASK_MAX)
                 throw std::invalid_argument("mask out of range");
-
+            
+            hasMask = true;
             slashCount++;
         }
 
         currentOctet.push_back(elem);
         index++;
     }
+
+    if (!hasMask)
+        throw std::invalid_argument("no mask provided");
 }
